@@ -85,3 +85,14 @@ export function getArticlesByPillar(pillar: PillarSlug): Article[] {
 export function getArticleBySlug(slug: string): Article | undefined {
   return getAllArticles().find((a) => a.slug === slug);
 }
+
+/**
+ * Rotates deterministically through all articles, one per day, based on the
+ * current date — no scheduled job needed, it just changes on its own.
+ */
+export function getTodaysPick(articles: Article[]): Article {
+  const stableOrder = [...articles].sort((a, b) => a.slug.localeCompare(b.slug));
+  const startOfYear = new Date(new Date().getFullYear(), 0, 0).getTime();
+  const dayOfYear = Math.floor((Date.now() - startOfYear) / 86_400_000);
+  return stableOrder[dayOfYear % stableOrder.length];
+}

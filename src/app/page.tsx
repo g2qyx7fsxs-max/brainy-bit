@@ -1,15 +1,19 @@
 import Link from "next/link";
 import { pillars } from "@/lib/pillars";
-import { getAllArticles } from "@/lib/content";
+import { getAllArticles, getTodaysPick } from "@/lib/content";
 import { PillarCard } from "@/components/PillarCard";
 import { ArticleCard } from "@/components/ArticleCard";
 import { GamificationTeaser } from "@/components/GamificationTeaser";
 import { VisitorBadge } from "@/components/VisitorBadge";
 
+// Re-check which article is "today's pick" at most once an hour, so the
+// rotation catches up shortly after midnight without needing a full rebuild.
+export const revalidate = 3600;
+
 export default function Home() {
   const articles = getAllArticles();
-  const featured = articles[0];
-  const latest = articles.slice(1, 7);
+  const featured = getTodaysPick(articles);
+  const latest = articles.filter((a) => a.slug !== featured.slug).slice(0, 6);
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-14 px-4 py-10 sm:px-6">
