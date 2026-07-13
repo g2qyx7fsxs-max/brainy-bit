@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { PillarSlug } from "@/lib/pillars";
+import { getOrCreateClientId } from "@/lib/clientId";
 
 /**
  * Fires anonymous, aggregate-only analytics: one "page view" ping on mount,
@@ -22,7 +23,7 @@ export function PageViewTracker({
     fetch("/api/track/view", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pillar, articleSlug }),
+      body: JSON.stringify({ pillar, articleSlug, clientId: getOrCreateClientId() }),
       keepalive: true,
     }).catch(() => {});
   }, [pillar, articleSlug]);

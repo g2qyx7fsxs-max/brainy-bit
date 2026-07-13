@@ -47,7 +47,7 @@ export default async function AdminDashboardPage() {
 
   const maxPillarViews = Math.max(1, ...data.viewsByPillar.map((p) => p.views));
   const maxTime = Math.max(1, ...data.avgSecondsByPillar.map((p) => p.avgSeconds));
-  const maxCountry = Math.max(1, ...data.viewsByCountry.map((c) => c.views));
+  const maxCountry = Math.max(1, ...data.visitorsByCountry.map((c) => c.visitors));
 
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-10 px-4 py-12 sm:px-6">
@@ -85,7 +85,7 @@ export default async function AdminDashboardPage() {
         <div className="rounded-2xl bg-gray-50 p-5">
           <p className="text-xs font-bold uppercase tracking-wide text-gray-400">Countries</p>
           <p className="mt-1 text-3xl font-extrabold text-gray-900">
-            {data.viewsByCountry.length.toLocaleString()}
+            {data.visitorsByCountry.length.toLocaleString()}
           </p>
         </div>
       </div>
@@ -193,15 +193,15 @@ export default async function AdminDashboardPage() {
 
       <section className="flex flex-col gap-4">
         <h2 className="text-lg font-extrabold text-gray-900">Visitors by country</h2>
-        {data.viewsByCountry.length ? (
+        {data.visitorsByCountry.length ? (
           <div className="flex flex-col gap-4 rounded-3xl border border-gray-100 p-6">
-            {data.viewsByCountry.map((c) => (
+            {data.visitorsByCountry.map((c) => (
               <BarRow
                 key={c.country}
                 label={c.country}
-                value={c.views}
+                value={c.visitors}
                 max={maxCountry}
-                suffix={c.views.toLocaleString()}
+                suffix={c.visitors.toLocaleString()}
                 colorClass="bg-emerald-500"
               />
             ))}

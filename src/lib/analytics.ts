@@ -11,7 +11,11 @@ const VIEWS_BY_ARTICLE_KEY = "brainy-bit:analytics:views-by-article";
 const LIKE_COUNTS_KEY = "brainy-bit:like-counts";
 const TIME_SUM_BY_PILLAR_KEY = "brainy-bit:analytics:time-sum-by-pillar";
 const TIME_COUNT_BY_PILLAR_KEY = "brainy-bit:analytics:time-count-by-pillar";
-const VIEWS_BY_COUNTRY_KEY = "brainy-bit:analytics:views-by-country";
+// Country breakdown counts unique visitors, not page views — a visitor's
+// client ID is added to a per-country Set, so browsing 10 articles from
+// Turkey still only counts as 1 Turkish visitor, not 10.
+const COUNTRIES_SEEN_KEY = "brainy-bit:analytics:countries-seen";
+const COUNTRY_VISITOR_SET_PREFIX = "brainy-bit:analytics:country-visitors:";
 
 const redis =
   process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
@@ -29,6 +33,7 @@ export async function trackPageView(input: {
   pillar?: PillarSlug;
   articleSlug?: string;
   country?: string;
+  clientId?: string;
 }): Promise<void> {
   if (!redis) return;
 
@@ -40,7 +45,11 @@ export async function trackPageView(input: {
   if (input.articleSlug) {
     ops.push(redis.hincrby(VIEWS_BY_ARTICLE_KEY, input.articleSlug, 1));
   }
-  ops.push(redis.hincrby(VIEWS_BY_COUNTRY_KEY, input.country ?? "Unknown", 1));
+  if (input.clientId) {
+    const country = input.country ?? "Unknown";
+    ops.push(redis.sadd(COUNTRY_VISITOR_SET_PREFIX + country, input.clientId));
+    ops.push(redis.sadd(COUNTRIES_SEEN_KEY, country));
+  }
 
   await Promise.all(ops);
 }
@@ -63,7 +72,7 @@ export interface AnalyticsSummary {
   topArticles: { slug: string; title: string; pillar: string; views: number }[];
   mostLikedArticles: { slug: string; title: string; pillar: string; likes: number }[];
   avgSecondsByPillar: { pillar: string; name: string; avgSeconds: number; sessions: number }[];
-  viewsByCountry: { country: string; views: number }[];
+  visitorsByCountry: { country: string; visitors: number }[];
   connected: boolean;
 }
 
@@ -75,12 +84,12 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
       topArticles: [],
       mostLikedArticles: [],
       avgSecondsByPillar: [],
-      viewsByCountry: [],
+      visitorsByCountry: [],
       connected: false,
     };
   }
 
-  const [totalViews, viewsByPillarRaw, viewsByArticleRaw, likesByArticleRaw, timeSumRaw, timeCountRaw, viewsByCountryRaw] =
+  const [totalViews, viewsByPillarRaw, viewsByArticleRaw, likesByArticleRaw, timeSumRaw, timeCountRaw, countriesSeen] =
     await Promise.all([
       redis.get<number>(TOTAL_VIEWS_KEY),
       redis.hgetall<Record<string, number>>(VIEWS_BY_PILLAR_KEY),
@@ -88,7 +97,7 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
       redis.hgetall<Record<string, number>>(LIKE_COUNTS_KEY),
       redis.hgetall<Record<string, number>>(TIME_SUM_BY_PILLAR_KEY),
       redis.hgetall<Record<string, number>>(TIME_COUNT_BY_PILLAR_KEY),
-      redis.hgetall<Record<string, number>>(VIEWS_BY_COUNTRY_KEY),
+      redis.smembers<string[]>(COUNTRIES_SEEN_KEY),
     ]);
 
   const articles = getAllArticles();
@@ -143,9 +152,14 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
     })
     .sort((a, b) => b.avgSeconds - a.avgSeconds);
 
-  const viewsByCountry = Object.entries(viewsByCountryRaw ?? {})
-    .map(([country, views]) => ({ country, views: Number(views) }))
-    .sort((a, b) => b.views - a.views);
+  const visitorsByCountry = (
+    await Promise.all(
+      (countriesSeen ?? []).map(async (country) => ({
+        country,
+        visitors: await redis!.scard(COUNTRY_VISITOR_SET_PREFIX + country),
+      }))
+    )
+  ).sort((a, b) => b.visitors - a.visitors);
 
   return {
     totalViews: Number(totalViews ?? 0),
@@ -153,7 +167,7 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
     topArticles,
     mostLikedArticles,
     avgSecondsByPillar,
-    viewsByCountry,
+    visitorsByCountry,
     connected: true,
   };
 }
