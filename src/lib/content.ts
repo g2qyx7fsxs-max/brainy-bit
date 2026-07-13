@@ -24,6 +24,11 @@ export interface RelatedEvent {
   description: string;
 }
 
+export interface RelatedFigure {
+  name: string;
+  description: string;
+}
+
 export interface QuizQuestion {
   question: string;
   options: string[];
@@ -41,6 +46,7 @@ export interface ArticleFrontmatter {
   source?: ArticleSource;
   relatedBooks?: RelatedBook[];
   relatedEvents?: RelatedEvent[];
+  relatedFigures?: RelatedFigure[];
   quiz?: QuizQuestion[];
 }
 

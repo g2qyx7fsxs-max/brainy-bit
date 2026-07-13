@@ -76,7 +76,11 @@ export default async function ArticlePage({
           <LikeButton slug={article.slug} />
         </div>
 
-        <RelatedRecommendations books={article.relatedBooks} events={article.relatedEvents} />
+        <RelatedRecommendations
+          books={article.relatedBooks}
+          events={article.relatedEvents}
+          figures={article.relatedFigures}
+        />
 
         <ShareLinks slug={article.slug} title={article.title} />
       </article>
