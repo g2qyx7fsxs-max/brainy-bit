@@ -10,6 +10,7 @@ import { RelatedRecommendations } from "@/components/RelatedRecommendations";
 import { ArticleHeader } from "@/components/ArticleHeader";
 import { ShareLinks } from "@/components/ShareLinks";
 import { ArticleQuiz } from "@/components/ArticleQuiz";
+import { PageViewTracker } from "@/components/PageViewTracker";
 
 export function generateStaticParams() {
   return getAllArticles().map((article) => ({ slug: article.slug }));
@@ -41,6 +42,7 @@ export default async function ArticlePage({
 
   return (
     <div className="flex flex-col">
+      <PageViewTracker pillar={article.pillar} articleSlug={article.slug} />
       {pillar ? <ArticleHeader pillar={pillar} /> : null}
 
       <article className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10 sm:px-6">

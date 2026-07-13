@@ -31,6 +31,15 @@ export function Footer() {
         <Link href="/about" className="text-sm font-medium text-violet-700 underline">
           Meet the founder
         </Link>
+        <div className="flex items-center gap-3 text-xs text-gray-400">
+          <Link href="/parents" className="underline hover:text-gray-600">
+            For parents
+          </Link>
+          <span aria-hidden>·</span>
+          <Link href="/privacy" className="underline hover:text-gray-600">
+            Privacy policy
+          </Link>
+        </div>
         <p className="text-xs text-gray-400">© {new Date().getFullYear()} Brainy Bit</p>
       </div>
     </footer>

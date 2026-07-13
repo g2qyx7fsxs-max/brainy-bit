@@ -5,6 +5,8 @@ import { PillarCard } from "@/components/PillarCard";
 import { ArticleCard } from "@/components/ArticleCard";
 import { GamificationTeaser } from "@/components/GamificationTeaser";
 import { VisitorBadge } from "@/components/VisitorBadge";
+import { PageViewTracker } from "@/components/PageViewTracker";
+import { SiteShareLinks } from "@/components/SiteShareLinks";
 
 // Re-check which article is "today's pick" at most once an hour, so the
 // rotation catches up shortly after midnight without needing a full rebuild.
@@ -17,6 +19,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-14 px-4 py-10 sm:px-6">
+      <PageViewTracker />
       <section className="flex flex-col items-center gap-4 text-center">
         <span className="rounded-full bg-gradient-to-r from-violet-100 to-sky-100 px-3 py-1 text-xs font-bold tracking-wide text-violet-700 uppercase">
           ✦ Unlock the mind of a genius
@@ -54,7 +57,7 @@ export default function Home() {
         <p className="mb-4 text-sm font-bold text-gray-500 uppercase tracking-wide">
           Pick a topic
         </p>
-        <div className="grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
           {pillars.map((pillar) => (
             <PillarCard
               key={pillar.slug}
@@ -77,6 +80,8 @@ export default function Home() {
           </div>
         </section>
       ) : null}
+
+      <SiteShareLinks />
 
       <GamificationTeaser />
     </div>

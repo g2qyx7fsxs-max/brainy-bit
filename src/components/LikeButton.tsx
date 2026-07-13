@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import confetti from "canvas-confetti";
 
 const STORAGE_KEY = "brainy-bit:liked-articles";
@@ -60,6 +60,16 @@ export function LikeButton({ slug }: { slug: string }) {
     () => getLikedSlugs().includes(slug),
     () => false
   );
+  const [count, setCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch(`/api/likes/${slug}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (typeof data.count === "number") setCount(data.count);
+      })
+      .catch(() => {});
+  }, [slug]);
 
   function toggleLike(event: React.MouseEvent<HTMLButtonElement>) {
     const likedSlugs = new Set(getLikedSlugs());
@@ -71,6 +81,17 @@ export function LikeButton({ slug }: { slug: string }) {
       likedSlugs.add(slug);
     }
     setLikedSlugs(likedSlugs);
+
+    fetch(`/api/likes/${slug}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ liked: !wasLiked }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (typeof data.count === "number") setCount(data.count);
+      })
+      .catch(() => {});
 
     if (!wasLiked) {
       const rect = event.currentTarget.getBoundingClientRect();
@@ -96,6 +117,9 @@ export function LikeButton({ slug }: { slug: string }) {
         {isLiked ? "❤️" : "🤍"}
       </span>
       {isLiked ? "Liked" : "Like"}
+      {count !== null && count > 0 ? (
+        <span className={isLiked ? "text-pink-500" : "text-gray-400"}>{count}</span>
+      ) : null}
     </button>
   );
 }

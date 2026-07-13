@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { pillars, getPillar, PillarSlug } from "@/lib/pillars";
 import { getArticlesByPillar } from "@/lib/content";
 import { ArticleCard } from "@/components/ArticleCard";
+import { PageViewTracker } from "@/components/PageViewTracker";
 
 export function generateStaticParams() {
   return pillars.map((pillar) => ({ pillar: pillar.slug }));
@@ -34,6 +35,7 @@ export default async function PillarPage({
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-10 sm:px-6">
+      <PageViewTracker pillar={pillar.slug} />
       <section className={`rounded-3xl ${pillar.classes.bg} p-8`}>
         <span className="text-4xl" aria-hidden>
           {pillar.emoji}

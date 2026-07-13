@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { NewsletterSignup } from "@/components/NewsletterSignup";
+import { SiteShareLinks } from "@/components/SiteShareLinks";
 
 const FOUNDER_EMAIL = "hellobrainybit@gmail.com";
 
@@ -73,6 +74,8 @@ export default function AboutPage() {
           Email {FOUNDER_EMAIL}
         </a>
       </section>
+
+      <SiteShareLinks />
     </div>
   );
 }

@@ -10,7 +10,7 @@ export function Header() {
           <LogoLockup />
         </Link>
 
-        <div className="flex shrink-0 items-center gap-1 rounded-full bg-orange-50 px-3 py-1.5 text-sm font-semibold text-orange-600">
+        <div className="flex shrink-0 items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1.5 text-xs font-semibold whitespace-nowrap text-orange-600 sm:px-3 sm:text-sm">
           <span aria-hidden>🔥</span>
           <span className="hidden sm:inline">Streaks coming soon</span>
           <span className="sm:hidden">Soon</span>
