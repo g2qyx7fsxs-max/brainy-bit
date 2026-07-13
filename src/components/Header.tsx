@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { pillars } from "@/lib/pillars";
 import { LogoLockup } from "@/components/Logo";
+import { StreakBadge } from "@/components/StreakBadge";
 
 export function Header() {
   return (
@@ -10,11 +11,9 @@ export function Header() {
           <LogoLockup />
         </Link>
 
-        <div className="flex shrink-0 items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1.5 text-xs font-semibold whitespace-nowrap text-orange-600 sm:px-3 sm:text-sm">
-          <span aria-hidden>🔥</span>
-          <span className="hidden sm:inline">Streaks coming soon</span>
-          <span className="sm:hidden">Soon</span>
-        </div>
+        <Link href="/badges" className="transition active:scale-95">
+          <StreakBadge />
+        </Link>
       </div>
 
       <nav className="mx-auto flex max-w-5xl gap-1.5 overflow-x-auto px-4 pb-3 sm:px-6">

@@ -11,6 +11,10 @@ export function generateStaticParams() {
 
 export const dynamicParams = false;
 
+// Lets each article's "New" badge correctly expire a week after publishing,
+// even between deploys.
+export const revalidate = 86_400;
+
 export async function generateMetadata({
   params,
 }: {

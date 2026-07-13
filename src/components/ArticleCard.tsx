@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Article } from "@/lib/content";
+import { Article, isRecentlyPublished } from "@/lib/content";
 import { getPillar } from "@/lib/pillars";
 import { readingLevelLabel } from "@/lib/labels";
 
@@ -10,8 +10,14 @@ export function ArticleCard({ article }: { article: Article }) {
   return (
     <Link
       href={`/articles/${article.slug}`}
-      className="group flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.98] active:shadow-sm"
+      className="group relative flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-[0.98] active:shadow-sm"
     >
+      {isRecentlyPublished(article.publishedDate) ? (
+        <span className="absolute top-3 right-3 rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-bold tracking-wide text-white uppercase">
+          New
+        </span>
+      ) : null}
+
       <span
         className={`w-fit rounded-full px-2.5 py-1 text-xs font-semibold ${pillar.classes.badge}`}
       >

@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { QuizQuestion } from "@/lib/content";
+
+export const QUIZ_COMPLETED_EVENT = "brainy-bit:quiz-completed";
 
 const RESULTS = [
   { label: "Rookie", icon: "🌱" },
@@ -15,6 +17,10 @@ export function ArticleQuiz({ questions }: { questions: QuizQuestion[] }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (done) window.dispatchEvent(new Event(QUIZ_COMPLETED_EVENT));
+  }, [done]);
 
   if (!questions.length) return null;
 

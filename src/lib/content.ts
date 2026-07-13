@@ -92,6 +92,13 @@ export function getArticleBySlug(slug: string): Article | undefined {
   return getAllArticles().find((a) => a.slug === slug);
 }
 
+const NEW_BADGE_WINDOW_DAYS = 7;
+
+export function isRecentlyPublished(publishedDate: string): boolean {
+  const ageMs = Date.now() - new Date(publishedDate).getTime();
+  return ageMs >= 0 && ageMs < NEW_BADGE_WINDOW_DAYS * 86_400_000;
+}
+
 /**
  * Rotates deterministically through all articles, one per day, based on the
  * current date — no scheduled job needed, it just changes on its own.
