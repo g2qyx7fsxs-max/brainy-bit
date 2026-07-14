@@ -8,6 +8,7 @@ export function ShareLinks({ slug, title }: { slug: string; title: string }) {
   const emailHref = `mailto:?subject=${encodeURIComponent(
     `Thought you'd like this: ${title}`
   )}&body=${encodeURIComponent(message)}`;
+  const linkedinHref = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
 
   return (
     <div className="rounded-2xl bg-gray-50 p-5">
@@ -32,6 +33,14 @@ export function ShareLinks({ slug, title }: { slug: string; title: string }) {
           className="flex items-center gap-2 rounded-full bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-700 active:scale-95"
         >
           Email
+        </a>
+        <a
+          href={linkedinHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 rounded-full bg-[#0A66C2] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#0958A8] active:scale-95"
+        >
+          LinkedIn
         </a>
       </div>
     </div>
