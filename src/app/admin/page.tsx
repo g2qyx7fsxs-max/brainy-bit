@@ -69,9 +69,9 @@ export default async function AdminDashboardPage() {
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <div className="rounded-2xl bg-gray-50 p-5">
-          <p className="text-xs font-bold uppercase tracking-wide text-gray-400">Total views</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-gray-400">Total visitors</p>
           <p className="mt-1 text-3xl font-extrabold text-gray-900">
-            {data.totalViews.toLocaleString()}
+            {data.totalVisitors.toLocaleString()}
           </p>
         </div>
         <div className="rounded-2xl bg-gray-50 p-5">

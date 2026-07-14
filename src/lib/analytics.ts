@@ -2,7 +2,9 @@ import { Redis } from "@upstash/redis";
 import { getAllArticles } from "./content";
 import { pillars, type PillarSlug } from "./pillars";
 
-const TOTAL_VIEWS_KEY = "brainy-bit:analytics:total-views";
+// Total visitor count is deduplicated by client ID too — one person
+// browsing 20 pages, or returning on 5 different days, still counts once.
+const ALL_VISITORS_KEY = "brainy-bit:analytics:all-visitors";
 const VIEWS_BY_PILLAR_KEY = "brainy-bit:analytics:views-by-pillar";
 const VIEWS_BY_ARTICLE_KEY = "brainy-bit:analytics:views-by-article";
 // Reuses the same hash the live like button already writes to (see
@@ -37,7 +39,7 @@ export async function trackPageView(input: {
 }): Promise<void> {
   if (!redis) return;
 
-  const ops: Promise<unknown>[] = [redis.incr(TOTAL_VIEWS_KEY)];
+  const ops: Promise<unknown>[] = [];
 
   if (input.pillar) {
     ops.push(redis.hincrby(VIEWS_BY_PILLAR_KEY, input.pillar, 1));
@@ -46,6 +48,7 @@ export async function trackPageView(input: {
     ops.push(redis.hincrby(VIEWS_BY_ARTICLE_KEY, input.articleSlug, 1));
   }
   if (input.clientId) {
+    ops.push(redis.sadd(ALL_VISITORS_KEY, input.clientId));
     const country = input.country ?? "Unknown";
     ops.push(redis.sadd(COUNTRY_VISITOR_SET_PREFIX + country, input.clientId));
     ops.push(redis.sadd(COUNTRIES_SEEN_KEY, country));
@@ -67,7 +70,7 @@ export async function trackTimeSpent(input: { pillar: PillarSlug; seconds: numbe
 }
 
 export interface AnalyticsSummary {
-  totalViews: number;
+  totalVisitors: number;
   viewsByPillar: { pillar: string; name: string; views: number }[];
   topArticles: { slug: string; title: string; pillar: string; views: number }[];
   mostLikedArticles: { slug: string; title: string; pillar: string; likes: number }[];
@@ -79,7 +82,7 @@ export interface AnalyticsSummary {
 export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
   if (!redis) {
     return {
-      totalViews: 0,
+      totalVisitors: 0,
       viewsByPillar: [],
       topArticles: [],
       mostLikedArticles: [],
@@ -89,9 +92,9 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
     };
   }
 
-  const [totalViews, viewsByPillarRaw, viewsByArticleRaw, likesByArticleRaw, timeSumRaw, timeCountRaw, countriesSeen] =
+  const [totalVisitors, viewsByPillarRaw, viewsByArticleRaw, likesByArticleRaw, timeSumRaw, timeCountRaw, countriesSeen] =
     await Promise.all([
-      redis.get<number>(TOTAL_VIEWS_KEY),
+      redis.scard(ALL_VISITORS_KEY),
       redis.hgetall<Record<string, number>>(VIEWS_BY_PILLAR_KEY),
       redis.hgetall<Record<string, number>>(VIEWS_BY_ARTICLE_KEY),
       redis.hgetall<Record<string, number>>(LIKE_COUNTS_KEY),
@@ -162,7 +165,7 @@ export async function getAnalyticsSummary(): Promise<AnalyticsSummary> {
   ).sort((a, b) => b.visitors - a.visitors);
 
   return {
-    totalViews: Number(totalViews ?? 0),
+    totalVisitors: Number(totalVisitors ?? 0),
     viewsByPillar,
     topArticles,
     mostLikedArticles,
