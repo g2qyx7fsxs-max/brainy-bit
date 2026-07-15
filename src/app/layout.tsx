@@ -23,6 +23,10 @@ export const metadata: Metadata = {
   },
   description:
     "Bite-sized, well-explained learning for curious kids: money, world news, geography & history, big questions & cool tech, books, and science & maths.",
+  openGraph: {
+    title: "Brainy Bit — Unlock the mind of a genius",
+    description: "Check out Brainy Bit - bite-sized learning for curious kids: https://www.brainybit.kids",
+  },
 };
 
 export default function RootLayout({
