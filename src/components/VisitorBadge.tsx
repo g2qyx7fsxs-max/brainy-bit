@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
+import { getOrCreateClientId } from "@/lib/clientId";
 
 const VISITOR_NUMBER_KEY = "brainy-bit:visitor-number";
 const CHANGE_EVENT = "brainy-bit:visitor-number-changed";
@@ -21,7 +22,11 @@ export function VisitorBadge() {
   useEffect(() => {
     if (number !== null) return;
 
-    fetch("/api/visitor-number", { method: "POST" })
+    fetch("/api/visitor-number", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clientId: getOrCreateClientId() }),
+    })
       .then((res) => res.json())
       .then((data) => {
         if (typeof data.number === "number" && data.number > 0) {
